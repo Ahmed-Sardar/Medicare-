@@ -1,0 +1,339 @@
+.admin-reservation-page {
+  padding-top: clamp(34px, 5vw, 58px);
+  padding-bottom: clamp(56px, 8vw, 88px);
+}
+
+.reservation-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.reservation-page-header h1 {
+  margin: 12px 0 8px;
+  color: var(--navy);
+  font: 800 clamp(32px, 4vw, 44px)/1.12 Manrope, sans-serif;
+  letter-spacing: -1.8px;
+}
+
+.reservation-page-header p {
+  max-width: 680px;
+  margin: 0;
+  color: #71827e;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.reservation-readonly-note {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  padding: 10px 13px;
+  border: 1px solid #d8ebe3;
+  border-radius: 999px;
+  background: #f2faf6;
+  color: #367461;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-reservations-card {
+  overflow: hidden;
+  padding: 0;
+  border-radius: 18px;
+  box-shadow: 0 10px 32px rgba(31, 58, 50, .055);
+}
+
+.reservation-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #edf1ef;
+  background: linear-gradient(120deg, #fff 55%, #fbfdfc);
+}
+
+.admin-reservations-card .reservation-filter {
+  width: min(100%, 350px);
+  max-width: none;
+  min-width: 220px;
+  margin: 0;
+}
+
+.admin-reservations-card .reservation-filter > span {
+  color: #536a64;
+  font-size: 11px;
+}
+
+.admin-reservations-card .reservation-filter select {
+  min-height: 44px;
+  border-color: #dce8e3;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.reservation-count {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 0 2px 11px;
+  color: #83918d;
+  font-size: 11px;
+}
+
+.reservation-count strong {
+  color: var(--navy);
+  font: 700 21px Manrope, sans-serif;
+}
+
+.reservation-table-wrap {
+  padding: 0 24px;
+}
+
+.reservation-table th {
+  padding: 15px 12px;
+  color: #7b8c87;
+  font-size: 10px;
+  letter-spacing: .55px;
+  text-transform: uppercase;
+}
+
+.reservation-table td {
+  padding: 17px 12px;
+  color: #536963;
+  font-size: 12px;
+}
+
+.reservation-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.reservation-table tbody tr:hover {
+  background: #fbfdfc;
+}
+
+.reservation-table time {
+  white-space: nowrap;
+  color: #647873;
+  font-variant-numeric: tabular-nums;
+}
+
+.reservation-table .reservation-medicine-name {
+  color: #243d43;
+  font-weight: 700;
+}
+
+.reservation-table td small {
+  font-size: 10px;
+}
+
+.reservation-table .pill {
+  padding: 6px 10px;
+  font-size: 10px;
+}
+
+.reservation-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 24px;
+  padding: 17px 0 20px;
+  border-top: 1px solid #edf1ef;
+  color: #71817d;
+  font-size: 12px;
+}
+
+.reservation-pagination > span {
+  text-align: center;
+}
+
+.reservation-pagination strong {
+  color: #3c5751;
+}
+
+.reservation-pagination .button {
+  min-height: 40px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-size: 11px;
+}
+
+.reservation-pagination .button:disabled {
+  opacity: .48;
+}
+
+.reservation-empty-state {
+  display: flex;
+  min-height: 270px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 24px 42px;
+  text-align: center;
+}
+
+.reservation-empty-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  margin-bottom: 16px;
+  border: 1px solid #dceee6;
+  border-radius: 20px;
+  background: #eff8f3;
+  color: var(--green);
+  box-shadow: 0 8px 20px rgba(8, 127, 104, .08);
+}
+
+.reservation-empty-state h2 {
+  margin: 0 0 7px;
+  color: #29434a;
+  font: 700 17px Manrope, sans-serif;
+}
+
+.reservation-empty-state p {
+  max-width: 390px;
+  margin: 0 0 16px;
+  color: #7b8b86;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.reservation-empty-state .button {
+  padding: 9px 13px;
+  border-radius: 9px;
+  font-size: 11px;
+}
+
+.reservation-error {
+  display: flex;
+  min-height: 220px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px;
+  text-align: center;
+}
+
+.reservation-error p {
+  margin: 0;
+  color: #8e4540;
+  font-size: 12px;
+}
+
+.workspace-strip {
+  background: linear-gradient(180deg, #f5faf7, #eef6f2);
+}
+
+.workspace-links {
+  height: auto;
+  min-height: 54px;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 7px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+.workspace-links .workspace-label {
+  flex: 0 0 100%;
+  margin: 0 0 1px 2px;
+  color: #8a9a94;
+  font-size: 8px;
+  letter-spacing: 1.2px;
+}
+
+.workspace-links a {
+  flex: 0 0 auto;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #4e6962;
+  font-size: 10px;
+  white-space: nowrap;
+  transition: background .16s ease, border-color .16s ease, color .16s ease;
+}
+
+.workspace-links a:hover {
+  border-color: #dcebe4;
+  background: #fff;
+  color: var(--green-dark);
+}
+
+.workspace-links a[aria-current="page"] {
+  border-color: #d6e9e1;
+  background: #fff;
+  color: var(--green-dark);
+  box-shadow: 0 2px 7px rgba(31, 58, 50, .045);
+}
+
+@media (max-width: 700px) {
+  .reservation-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .reservation-readonly-note {
+    padding: 8px 11px;
+  }
+
+  .reservation-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 13px;
+    padding: 18px;
+  }
+
+  .admin-reservations-card .reservation-filter {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .reservation-count {
+    padding-bottom: 0;
+  }
+
+  .reservation-table-wrap {
+    padding: 0 12px;
+  }
+
+  .reservation-table {
+    min-width: 640px;
+  }
+
+  .reservation-pagination {
+    margin: 0 16px;
+  }
+
+  .reservation-pagination-total {
+    display: none;
+  }
+
+  .workspace-links {
+    gap: 5px;
+  }
+
+  .workspace-links a {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 420px) {
+  .reservation-pagination {
+    flex-wrap: wrap;
+  }
+
+  .reservation-pagination > span {
+    order: -1;
+    width: 100%;
+  }
+}

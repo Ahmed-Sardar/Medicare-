@@ -1,0 +1,33 @@
+const idSchema = { type: 'string', pattern: '^[0-9a-fA-F]{24}$' };
+const revision = { type: 'integer', minimum: 0 };
+const reason = { type: 'string', minLength: 5, maxLength: 500 };
+const security = [{ cookieAuth: [] }];
+const idParameter = { name: 'id', in: 'path', required: true, schema: idSchema };
+const medicineProperties = {
+  name: { type: 'string', minLength: 2, maxLength: 160 }, brand: { type: 'string', maxLength: 160 }, genericName: { type: 'string', maxLength: 200 }, composition: { type: 'string', maxLength: 500 },
+  strength: { type: 'string', minLength: 1, maxLength: 100 }, dosageForm: { type: 'string', minLength: 1, maxLength: 100 }, manufacturer: { type: 'string', maxLength: 200 }, packSize: { type: 'string', maxLength: 100 },
+  aliases: { type: 'array', maxItems: 30, items: { type: 'string', minLength: 2, maxLength: 120 } }, categoryIds: { type: 'array', maxItems: 10, items: idSchema },
+  prescriptionClass: { type: 'string', enum: ['UNVERIFIED', 'OTC', 'PRESCRIPTION', 'CONTROLLED'] }, classificationVerified: { type: 'boolean', default: false }, classificationSource: { type: 'string', maxLength: 500 }, active: { type: 'boolean', default: true }, reason,
+};
+const categoryProperties = { name: { type: 'string', minLength: 2, maxLength: 100 }, description: { type: 'string', maxLength: 500 }, active: { type: 'boolean', default: true }, reason };
+const parameters = [{ name: 'q', in: 'query', schema: { type: 'string', maxLength: 100 } }, { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 10000, default: 1 } }, { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100 } }];
+const errors = { '400': { description: 'Invalid input, missing revision, unknown category, or incomplete classification review' }, '401': { description: 'Authentication required' }, '403': { description: 'medicine:manage permission required' }, '404': { description: 'Catalogue resource not found' }, '409': { description: 'Stale revision, identity locked by stock/history, demo review, or duplicate category name' } };
+const body = (properties: object, required: string[]) => ({ required: true, content: { 'application/json': { schema: { type: 'object', additionalProperties: false, required, properties } } } });
+export const cataloguePaths = {
+  '/medicines': { get: { summary: 'List active public catalogue medicines', parameters: [...parameters, { name: 'categoryId', in: 'query', schema: idSchema }], responses: { '200': { description: 'data contains medicines, total, page and limit. Active categories are included. Demo records require configured demo discovery. Reviewer IDs and internal revision/identity metadata are omitted.' }, '404': { description: 'Selected active category not found' } } } },
+  '/medicines/{id}': { get: { summary: 'Read one active public catalogue medicine', parameters: [idParameter], responses: { '200': { description: 'data.medicine includes product identity, aliases, active category summaries and reviewed classification metadata. Incomplete/legacy classification reviews are shown as UNVERIFIED.' }, '404': { description: 'Medicine inactive, hidden demo or not found' } } } },
+  '/medicine-categories': { get: { summary: 'List active medicine categories', parameters, responses: { '200': { description: 'data contains categories with _id, name and description, plus total, page and limit' } } } },
+  '/admin/medicines': {
+    get: { summary: 'Search all catalogue entries, including inactive/demo entries', security, parameters: [...parameters, { name: 'active', in: 'query', schema: { type: 'string', enum: ['all', 'true', 'false'] } }, { name: 'categoryId', in: 'query', schema: idSchema }], responses: { '200': { description: 'data contains medicines, total, page, limit. Entries include revision, categoryIds/category summaries and identityLocked; the lock also recognizes legacy stock/reservation references.' }, ...errors } },
+    post: { summary: 'Create a medicine catalogue entry', description: 'Requires medicine:manage. All supplied text must be plain text without control characters. Verified classification requires a non-UNVERIFIED class and a source reference of at least five characters. The server records the reviewer and date. Creation and audit commit together.', security, requestBody: body(medicineProperties, ['name', 'strength', 'dosageForm', 'reason']), responses: { '201': { description: 'data.medicine contains the created entry at revision 0' }, ...errors } },
+  },
+  '/admin/medicines/{id}': {
+    get: { summary: 'Read an administrative medicine entry', security, parameters: [idParameter], responses: { '200': { description: 'data.medicine includes revision, category summaries and identityLocked' }, ...errors } },
+    patch: { summary: 'Save a complete medicine editor form', description: 'Send all editable fields. Fields with defaults are reset when omitted. A current revision and audit reason are mandatory. Product identity cannot change once referenced by inventory/reservations; aliases, category links, review and active state remain editable. New category links must be active; existing archived links may remain. Demo classifications cannot be verified.', security, parameters: [idParameter], requestBody: body({ ...medicineProperties, revision }, ['name', 'strength', 'dosageForm', 'revision', 'reason']), responses: { '200': { description: 'data.medicine contains the saved entry with incremented revision' }, ...errors } },
+  },
+  '/admin/medicine-categories': {
+    get: { summary: 'Search active and archived categories', security, parameters: [...parameters, { name: 'active', in: 'query', schema: { type: 'string', enum: ['all', 'true', 'false'] } }], responses: { '200': { description: 'data contains categories, total, page and limit' }, ...errors } },
+    post: { summary: 'Create a uniquely named category', security, requestBody: body(categoryProperties, ['name', 'reason']), responses: { '201': { description: 'data.category contains the created category at revision 0' }, ...errors } },
+  },
+  '/admin/medicine-categories/{id}': { patch: { summary: 'Rename or archive a category', description: 'Send the complete editor form. Names are unique after NFKC normalization, whitespace collapsing and case folding. Archive preserves references and hides public category metadata. Requires current revision and reason.', security, parameters: [idParameter], requestBody: body({ ...categoryProperties, revision }, ['name', 'revision', 'reason']), responses: { '200': { description: 'data.category contains the saved category with incremented revision' }, ...errors } } },
+};

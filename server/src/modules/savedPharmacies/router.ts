@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import { Pharmacy, SavedPharmacy } from '../models.js';
+import { authenticate } from '../../middleware/auth.js';
+import { requirePermission } from '../../middleware/authorize.js';
+import { asyncHandler } from '../../utils/asyncHandler.js';
+import { ApiError } from '../../utils/errors.js';
+export const savedPharmaciesRouter = Router(); savedPharmaciesRouter.use(authenticate, requirePermission('pharmacy:save'));
+savedPharmaciesRouter.get('/', asyncHandler(async (req, res) => { const saved = await SavedPharmacy.find({ userId: req.auth!.id }).sort({ createdAt: -1 }).populate({ path: 'pharmacyId', select: 'name address pinCode city state phone location openingHours verificationStatus active' }); res.json({ success: true, data: { saved } }); }));
+savedPharmaciesRouter.post('/', asyncHandler(async (req, res) => { const { pharmacyId } = z.object({ pharmacyId: z.string().regex(/^[0-9a-f]{24}$/i) }).parse(req.body); const pharmacy = await Pharmacy.findOne({ _id: pharmacyId, active: true, verificationStatus: 'APPROVED', isDemo: { $ne: true } }); if (!pharmacy) throw new ApiError(404, 'Pharmacy not found'); const saved = await SavedPharmacy.findOneAndUpdate({ userId: req.auth!.id, pharmacyId }, { $setOnInsert: { userId: req.auth!.id, pharmacyId } }, { upsert: true, new: true }); res.status(201).json({ success: true, data: { saved } }); }));
+savedPharmaciesRouter.delete('/:pharmacyId', asyncHandler(async (req, res) => { const result = await SavedPharmacy.deleteOne({ userId: req.auth!.id, pharmacyId: req.params.pharmacyId }); if (!result.deletedCount) throw new ApiError(404, 'Saved pharmacy not found'); res.json({ success: true, data: { removed: true } }); }));

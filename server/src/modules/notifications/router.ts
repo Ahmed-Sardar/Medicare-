@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { Notification } from '../models.js';
+import { authenticate } from '../../middleware/auth.js';
+import { asyncHandler } from '../../utils/asyncHandler.js';
+import { ApiError } from '../../utils/errors.js';
+import { z } from 'zod';
+export const notificationsRouter = Router(); notificationsRouter.use(authenticate);
+notificationsRouter.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next(); });
+notificationsRouter.get('/', asyncHandler(async (req, res) => { const { page, limit } = z.object({ page: z.coerce.number().int().min(1).max(10000).default(1), limit: z.coerce.number().int().min(1).max(50).default(20) }).strict().parse(req.query); const filter = { userId: req.auth!.id }; const [notifications, unread, total] = await Promise.all([Notification.find(filter).sort({ createdAt: -1, _id: -1 }).skip((page - 1) * limit).limit(limit), Notification.countDocuments({ ...filter, readAt: { $exists: false } }), Notification.countDocuments(filter)]); res.json({ success: true, data: { notifications, unread, total, page, limit } }); }));
+notificationsRouter.patch('/:id/read', asyncHandler(async (req, res) => { const id = z.string().regex(/^[0-9a-f]{24}$/i).parse(req.params.id); const notification = await Notification.findOneAndUpdate({ _id: id, userId: req.auth!.id }, { $set: { readAt: new Date() } }, { new: true }); if (!notification) throw new ApiError(404, 'Notification not found'); res.json({ success: true, data: { notification } }); }));
+notificationsRouter.post('/read-all', asyncHandler(async (req, res) => { const result = await Notification.updateMany({ userId: req.auth!.id, readAt: { $exists: false } }, { $set: { readAt: new Date() } }); res.json({ success: true, data: { updated: result.modifiedCount } }); }));
